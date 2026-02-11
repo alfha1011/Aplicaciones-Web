@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+@import "flowbite/src/themes/default";
+
+@plugin "flowbite/plugin";
+
+@source "../../node_modules/flowbite";
+
+.uiverse-register .form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 350px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 20px;
+}
+
+.uiverse-register .title {
+    font-size: 28px;
+    color: royalblue;
+    font-weight: 600;
+    letter-spacing: -1px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding-left: 30px;
+}
+
+.uiverse-register .title::before,
+.uiverse-register .title::after {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    left: 0px;
+    background-color: royalblue;
+}
+
+.uiverse-register .title::after {
+    animation: pulse 1s linear infinite;
+}
+
+.uiverse-register .message,
+.uiverse-register .signin {
+    color: rgba(88, 87, 87, 0.82);
+    font-size: 14px;
+}
+
+.uiverse-register .signin {
+    text-align: center;
+}
+
+.uiverse-register .signin a {
+    color: royalblue;
+}
+
+.uiverse-register .flex {
+    display: flex;
+    gap: 6px;
+}
+
+.uiverse-register label {
+    position: relative;
+}
+
+.uiverse-register .input {
+    width: 100%;
+    padding: 10px 10px 20px;
+    border: 1px solid rgba(105, 105, 105, 0.4);
+    border-radius: 10px;
+}
+
+.uiverse-register .input + span {
+    position: absolute;
+    left: 10px;
+    top: 15px;
+    font-size: 0.9em;
+    color: grey;
+    transition: 0.3s;
+}
+
+.uiverse-register .input:focus + span,
+.uiverse-register .input:valid + span {
+    top: 30px;
+    font-size: 0.7em;
+    font-weight: 600;
+    color: green;
+}
+
+.uiverse-register .submit {
+    background-color: royalblue;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.uiverse-register .submit:hover {
+    background-color: rgb(56, 90, 194);
+}
+
+@keyframes pulse {
+    from { transform: scale(0.9); opacity: 1; }
+    to { transform: scale(1.8); opacity: 0; }
+}
