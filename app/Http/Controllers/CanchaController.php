@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cancha;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage; // 👈 IMPORTANTE
 
 class CanchaController extends Controller
 {
@@ -12,9 +13,7 @@ class CanchaController extends Controller
      */
     public function listado()
     {
-        // Solo muestra canchas activas (activo = 1)
         $canchas = Cancha::where('activo', 1)->get();
-        
         return view('canchas.listado', compact('canchas'));
     }
 
@@ -23,9 +22,7 @@ class CanchaController extends Controller
      */
     public function deshabilitadas()
     {
-        // Solo muestra canchas deshabilitadas (activo = 0)
         $canchas = Cancha::where('activo', 0)->get();
-        
         return view('canchas.deshabilitadas', compact('canchas'));
     }
 
@@ -35,8 +32,6 @@ class CanchaController extends Controller
     public function deshabilitar($id)
     {
         $cancha = Cancha::findOrFail($id);
-        
-        // Cambia activo a 0 (deshabilitado)
         $cancha->activo = 0;
         $cancha->save();
         
@@ -50,8 +45,6 @@ class CanchaController extends Controller
     public function habilitar($id)
     {
         $cancha = Cancha::findOrFail($id);
-        
-        // Cambia activo a 1 (habilitado)
         $cancha->activo = 1;
         $cancha->save();
         
@@ -68,7 +61,7 @@ class CanchaController extends Controller
     }
 
     /**
-     * GUARDAR - Guardar nueva cancha
+     * GUARDAR - Guardar nueva cancha (CON 3 IMÁGENES)
      */
     public function guardar(Request $request)
     {
@@ -79,6 +72,9 @@ class CanchaController extends Controller
             'precio_hora' => 'required|numeric|min:0',
             'estado' => 'required|in:disponible,ocupada,mantenimiento',
             'descripcion' => 'nullable|string|max:1000',
+            'imagen1' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', 
+            'imagen2' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'imagen3' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', 
         ], [
             'nombre.required' => 'El nombre de la cancha es obligatorio.',
             'nombre.max' => 'El nombre no puede tener más de 255 caracteres.',
@@ -90,49 +86,65 @@ class CanchaController extends Controller
             'estado.required' => 'El estado es obligatorio.',
             'estado.in' => 'El estado debe ser: disponible, ocupada o mantenimiento.',
             'descripcion.max' => 'La descripción no puede tener más de 1000 caracteres.',
+            'imagen1.required' => 'La imagen 1 es obligatoria.',
+            'imagen1.image' => 'El archivo debe ser una imagen.',
+            'imagen2.required' => 'La imagen 2 es obligatoria.',
+            'imagen2.image' => 'El archivo debe ser una imagen.',
+            'imagen3.required' => 'La imagen 3 es obligatoria.',
+            'imagen3.image' => 'El archivo debe ser una imagen.',
         ]);
 
         // Crear la cancha (por defecto activo = 1)
-        Cancha::create([
+        $cancha = Cancha::create([
             'nombre' => $request->nombre,
             'tipo' => $request->tipo,
             'precio_hora' => $request->precio_hora,
             'estado' => $request->estado,
             'descripcion' => $request->descripcion,
-            'activo' => 1,  // Habilitada por defecto
+            'activo' => 1,
         ]);
+
+        // Subir 3 imágenes
+        for ($i = 1; $i <= 3; $i++) {
+            if ($request->hasFile("imagen$i")) {
+                $imagen = $request->file("imagen$i");
+                $extension = $imagen->getClientOriginalExtension();
+                $nombreImagen = "canchas_{$cancha->id}_{$i}.{$extension}";
+                
+                $imagen->storeAs('public/canchas', $nombreImagen);
+                
+                $campoImagen = "imagen$i";
+                $cancha->$campoImagen = $nombreImagen;
+            }
+        }
+        
+        $cancha->save();
 
         return redirect()->route('canchas.listado')
                         ->with('success', 'Cancha creada exitosamente.');
     }
 
-    /**
-     * EDITAR - Mostrar formulario de edición
-     */
+  
     public function editar($id)
     {
-        // Buscar la cancha por ID
         $cancha = Cancha::findOrFail($id);
-        
-        // Retornar vista con los datos de la cancha
         return view('canchas.editar', compact('cancha'));
     }
 
-    /**
-     * ACTUALIZAR - Actualizar los datos de la cancha
-     */
+   
     public function actualizar(Request $request, $id)
     {
-        // Buscar la cancha
         $cancha = Cancha::findOrFail($id);
 
-        // Validar datos con mensajes en español
         $request->validate([
             'nombre' => 'required|string|max:255',
             'tipo' => 'required|string|max:100',
             'precio_hora' => 'required|numeric|min:0',
             'estado' => 'required|in:disponible,ocupada,mantenimiento',
             'descripcion' => 'nullable|string|max:1000',
+            'imagen1' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', 
+            'imagen2' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', 
+            'imagen3' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ], [
             'nombre.required' => 'El nombre de la cancha es obligatorio.',
             'nombre.max' => 'El nombre no puede tener más de 255 caracteres.',
@@ -144,33 +156,56 @@ class CanchaController extends Controller
             'estado.required' => 'El estado es obligatorio.',
             'estado.in' => 'El estado debe ser: disponible, ocupada o mantenimiento.',
             'descripcion.max' => 'La descripción no puede tener más de 1000 caracteres.',
+            'imagen1.image' => 'El archivo debe ser una imagen.',
+            'imagen2.image' => 'El archivo debe ser una imagen.',
+            'imagen3.image' => 'El archivo debe ser una imagen.',
         ]);
 
-        // Actualizar la cancha con los nuevos datos
-        $cancha->update([
-            'nombre' => $request->nombre,
-            'tipo' => $request->tipo,
-            'precio_hora' => $request->precio_hora,
-            'estado' => $request->estado,
-            'descripcion' => $request->descripcion,
-        ]);
+        // Actualizar datos
+        $cancha->nombre = $request->nombre;
+        $cancha->tipo = $request->tipo;
+        $cancha->precio_hora = $request->precio_hora;
+        $cancha->estado = $request->estado;
+        $cancha->descripcion = $request->descripcion;
 
-        // Redirigir al listado con mensaje de éxito
+        // Actualizar imágenes si se subieron nuevas
+        for ($i = 1; $i <= 3; $i++) {
+            if ($request->hasFile("imagen$i")) {
+                // Eliminar imagen anterior
+                $campoImagen = "imagen$i";
+                if ($cancha->$campoImagen) {
+                    Storage::delete('public/canchas/' . $cancha->$campoImagen);
+                }
+                
+                $imagen = $request->file("imagen$i");
+                $extension = $imagen->getClientOriginalExtension();
+                $nombreImagen = "canchas_{$cancha->id}_{$i}.{$extension}";
+                $imagen->storeAs('public/canchas', $nombreImagen);
+                
+                $cancha->$campoImagen = $nombreImagen;
+            }
+        }
+
+        $cancha->save();
+
         return redirect()->route('canchas.listado')
                         ->with('success', 'Cancha "' . $cancha->nombre . '" actualizada exitosamente.');
     }
 
-    /**
-     * ELIMINAR - Elimina permanentemente la cancha
-     */
+   
     public function eliminar($id)
     {
         $cancha = Cancha::findOrFail($id);
         
-        // Guardar el nombre antes de eliminar
-        $nombreCancha = $cancha->nombre;
+        // Eliminar las 3 imágenes del storage
+        for ($i = 1; $i <= 3; $i++) {
+            $campoImagen = "imagen$i";
+            if ($cancha->$campoImagen) {
+                Storage::delete('public/canchas/' . $cancha->$campoImagen);
+            }
+        }
         
-        // Eliminar permanentemente
+        $nombreCancha = $cancha->nombre;
         $cancha->delete();
 
         return redirect()->route('canchas.listado')

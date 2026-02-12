@@ -16,7 +16,8 @@ class Administrador extends Model
         'apellido',
         'email',
         'password',
-        'telefono'
+        'telefono',
+        'imagen'
     ];
 
     protected $hidden = [

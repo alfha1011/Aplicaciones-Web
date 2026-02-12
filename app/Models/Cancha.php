@@ -9,14 +9,8 @@ class Cancha extends Model
 {
     use HasFactory;
 
-    /**
-     * La tabla asociada con el modelo
-     */
     protected $table = 'canchas';
 
-    /**
-     * Los atributos que son asignables en masa
-     */
     protected $fillable = [
         'nombre',
         'direccion',
@@ -32,11 +26,11 @@ class Cancha extends Model
         'descripcion',
         'capacidad',
         'tipo_pasto',
+        'imagen1',  
+        'imagen2',  
+        'imagen3'  
     ];
 
-    /**
-     * Los atributos que deben ser convertidos a tipos nativos
-     */
     protected $casts = [
         'activo' => 'boolean',
         'latitud' => 'decimal:8',
@@ -44,34 +38,23 @@ class Cancha extends Model
         'precio_hora' => 'decimal:2',
     ];
 
-    /**
-     * Scope para obtener solo canchas activas
-     */
+    // ... resto de tus métodos (scopes, getters, etc.) IGUAL
     public function scopeActivas($query)
     {
         return $query->where('activo', 1);
     }
 
-    /**
-     * Scope para obtener canchas con coordenadas
-     */
     public function scopeConCoordenadas($query)
     {
         return $query->whereNotNull('latitud')
                     ->whereNotNull('longitud');
     }
 
-    /**
-     * Scope para obtener canchas en una ciudad específica
-     */
     public function scopeEnCiudad($query, $ciudad)
     {
         return $query->where('ciudad', 'like', '%' . $ciudad . '%');
     }
 
-    /**
-     * Obtener URL de Google Maps
-     */
     public function getGoogleMapsUrlAttribute()
     {
         if ($this->latitud && $this->longitud) {
@@ -80,9 +63,6 @@ class Cancha extends Model
         return null;
     }
 
-    /**
-     * Obtener URL de direcciones en Google Maps
-     */
     public function getGoogleMapsDirectionsUrlAttribute()
     {
         if ($this->latitud && $this->longitud) {
@@ -91,29 +71,18 @@ class Cancha extends Model
         return null;
     }
 
-    /**
-     * Verificar si la cancha tiene coordenadas GPS
-     */
     public function tieneCoordenadas()
     {
         return !empty($this->latitud) && !empty($this->longitud);
     }
 
-    /**
-     * Calcular distancia a un punto usando fórmula de Haversine
-     * 
-     * @param float $latitud
-     * @param float $longitud
-     * @return float Distancia en kilómetros
-     */
     public function calcularDistancia($latitud, $longitud)
     {
         if (!$this->tieneCoordenadas()) {
             return null;
         }
 
-        $R = 6371; // Radio de la Tierra en km
-
+        $R = 6371;
         $lat1 = deg2rad($this->latitud);
         $lon1 = deg2rad($this->longitud);
         $lat2 = deg2rad($latitud);
@@ -131,9 +100,6 @@ class Cancha extends Model
         return $R * $c;
     }
 
-    /**
-     * Formatear distancia para lectura humana
-     */
     public function formatearDistancia($latitud, $longitud)
     {
         $distancia = $this->calcularDistancia($latitud, $longitud);
@@ -149,9 +115,6 @@ class Cancha extends Model
         return round($distancia, 2) . ' km';
     }
 
-    /**
-     * Obtener coordenadas como array
-     */
     public function getCoordenadasAttribute()
     {
         if ($this->tieneCoordenadas()) {
@@ -163,9 +126,6 @@ class Cancha extends Model
         return null;
     }
 
-    /**
-     * Obtener dirección completa formateada
-     */
     public function getDireccionCompletaAttribute()
     {
         $partes = array_filter([
@@ -179,17 +139,11 @@ class Cancha extends Model
         return implode(', ', $partes);
     }
 
-    /**
-     * Accessor para el estado de activación
-     */
     public function getEstadoTextoAttribute()
     {
         return $this->activo ? 'Activa' : 'Inactiva';
     }
 
-    /**
-     * Accessor para clase CSS según estado
-     */
     public function getEstadoClaseAttribute()
     {
         return $this->activo ? 'text-green-600' : 'text-red-600';

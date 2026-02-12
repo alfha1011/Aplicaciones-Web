@@ -22,34 +22,44 @@
             <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                 <tr>
                     <th scope="col" class="px-6 py-3">ID</th>
+                    <th scope="col" class="px-6 py-3">Foto</th> 
                     <th scope="col" class="px-6 py-3">Nombre</th>
                     <th scope="col" class="px-6 py-3">Apellido</th>
                     <th scope="col" class="px-6 py-3">Email</th>
                     <th scope="col" class="px-6 py-3">Teléfono</th>
+                    <th scope="col" class="px-6 py-3">Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($administradores as $admin)
                 <tr class="bg-white border-b hover:bg-gray-50">
                     <td class="px-6 py-4">{{ $admin->id }}</td>
+                    <td class="px-6 py-4">
+                        @if($admin->imagen)
+                            <img src="{{ asset('storage/administradores/' . $admin->imagen) }}" 
+                                 alt="Foto" class="h-10 w-10 rounded-full object-cover">
+                        @else
+                            <span class="text-gray-400 text-xs">Sin foto</span>
+                        @endif
+                    </td>
                     <td class="px-6 py-4 font-medium text-gray-900">{{ $admin->nombre }}</td>
                     <td class="px-6 py-4">{{ $admin->apellido }}</td>
                     <td class="px-6 py-4">{{ $admin->email }}</td>
                     <td class="px-6 py-4">{{ $admin->telefono ?? 'N/A' }}</td>
                     <td class="px-6 py-4">
-                            <a href="{{ route('admins.editar', $admin->id) }}"
-                                class="text-blue-600 hover:text-blue-900 mr-2">Editar</a>
-                            <form action="{{ route('admins.eliminar', $admin->id) }}" method="POST" class="inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:text-red-900"
-                                    onclick="return confirm('¿Estás seguro de eliminar esta cancha?')">Eliminar</button>
-                            </form>
-                        </td>
+                        <a href="{{ route('admins.editar', $admin->id) }}"
+                            class="text-blue-600 hover:text-blue-900 mr-2">Editar</a>
+                        <form action="{{ route('admins.eliminar', $admin->id) }}" method="POST" class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-600 hover:text-red-900"
+                                onclick="return confirm('¿Estás seguro de eliminar este administrador?')">Eliminar</button>
+                        </form>
+                    </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                    <td colspan="7" class="px-6 py-4 text-center text-gray-500">
                         No hay administradores registrados
                     </td>
                 </tr>

@@ -29,6 +29,7 @@
             <thead class="text-xs text-gray-700 uppercase bg-orange-50">
                 <tr>
                     <th scope="col" class="px-6 py-3">ID</th>
+                    <th scope="col" class="px-6 py-3">Imágenes</th>
                     <th scope="col" class="px-6 py-3">Nombre</th>
                     <th scope="col" class="px-6 py-3">Tipo</th>
                     <th scope="col" class="px-6 py-3">Precio/Hora</th>
@@ -41,6 +42,22 @@
                 @forelse($canchas as $cancha)
                 <tr class="bg-white border-b hover:bg-gray-50">
                     <td class="px-6 py-4">{{ $cancha->id }}</td>
+                    <td class="px-6 py-4">
+                        <div class="flex space-x-1">
+                            @if($cancha->imagen1)
+                                <img src="{{ asset('storage/canchas/' . $cancha->imagen1) }}" 
+                                     alt="Img1" class="h-10 w-10 object-cover rounded">
+                            @endif
+                            @if($cancha->imagen2)
+                                <img src="{{ asset('storage/canchas/' . $cancha->imagen2) }}" 
+                                     alt="Img2" class="h-10 w-10 object-cover rounded">
+                            @endif
+                            @if($cancha->imagen3)
+                                <img src="{{ asset('storage/canchas/' . $cancha->imagen3) }}" 
+                                     alt="Img3" class="h-10 w-10 object-cover rounded">
+                            @endif
+                        </div>
+                    </td>
                     <td class="px-6 py-4 font-medium text-gray-900">{{ $cancha->nombre }}</td>
                     <td class="px-6 py-4">{{ $cancha->tipo }}</td>
                     <td class="px-6 py-4">${{ number_format($cancha->precio_hora, 2) }}</td>
@@ -50,7 +67,6 @@
                         </span>
                     </td>
                     <td class="px-6 py-4">{{ $cancha->descripcion ?? 'N/A' }}</td>
-                   
                     <td class="px-6 py-4">
                         <form action="{{ route('canchas.habilitar', $cancha->id) }}" method="POST" class="inline">
                             @csrf
@@ -58,14 +74,14 @@
                             <button type="submit" 
                                     class="px-3 py-2 text-sm font-medium rounded-lg bg-green-600 text-white hover:bg-green-700"
                                     onclick="return confirm('¿Desea habilitar esta cancha nuevamente?')">
-                                 Habilitar
+                                Habilitar
                             </button>
                         </form>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="px-6 py-8 text-center">
+                    <td colspan="8" class="px-6 py-8 text-center">
                         <div class="text-gray-400">
                             <svg class="mx-auto h-12 w-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -79,6 +95,5 @@
             </tbody>
         </table>
     </div>
-
 </div>
 @endsection

@@ -1,13 +1,12 @@
 @extends('layouts.app')
 
-@section('titulo', 'Editar Clientes')
+@section('titulo', 'Editar Cliente')
 
 @section('contenido-principal')
 <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow">
 
     <h2 class="text-xl font-semibold mb-6">Editar Cliente</h2>
 
-    {{-- Errores --}}
     @if ($errors->any())
         <div class="mb-4 p-4 bg-red-100 text-red-700 rounded">
             <ul class="list-disc list-inside">
@@ -18,11 +17,11 @@
         </div>
     @endif
 
-    <form action="{{ route('clientes.actualizar', $cliente->id) }}" method="POST" class="space-y-4">
+    {{-- 👇 AGREGAR enctype --}}
+    <form action="{{ route('clientes.actualizar', $cliente->id) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
         @csrf
         @method('PUT')
 
-        {{-- ID (solo lectura) --}}
         <div>
             <label class="block mb-2.5 text-sm font-medium text-heading">ID</label>
             <input type="text"
@@ -31,7 +30,6 @@
                    class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base block w-full px-3 py-2 shadow-xs opacity-70">
         </div>
 
-        {{-- Nombre --}}
         <div>
             <label class="block mb-2.5 text-sm font-medium text-heading">Nombre</label>
             <input type="text"
@@ -41,7 +39,6 @@
                    class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs">
         </div>
 
-        {{-- Apellido --}}
         <div>
             <label class="block mb-2.5 text-sm font-medium text-heading">Apellido</label>
             <input type="text"
@@ -51,7 +48,6 @@
                    class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs">
         </div>
 
-        {{-- Email --}}
         <div>
             <label class="block mb-2.5 text-sm font-medium text-heading">Email</label>
             <input type="email"
@@ -61,7 +57,6 @@
                    class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs">
         </div>
 
-        {{-- Teléfono --}}
         <div>
             <label class="block mb-2.5 text-sm font-medium text-heading">Teléfono</label>
             <input type="text"
@@ -69,7 +64,7 @@
                    value="{{ old('telefono', $cliente->telefono) }}"
                    class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs">
         </div>
-        {{-- Dirección --}}
+
         <div>
             <label class="block mb-2.5 text-sm font-medium text-heading">Dirección</label>
             <input type="text"
@@ -78,16 +73,37 @@
                    class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs">
         </div>
 
-        
+        <div class="mb-4">
+            <label class="block mb-2.5 text-sm font-medium text-heading">Foto Actual</label>
+            @if($cliente->imagen)
+                <div class="mb-2">
+                    <img src="{{ asset('storage/clientes/' . $cliente->imagen) }}" 
+                         alt="Foto" class="h-32 w-32 object-cover rounded-lg border">
+                </div>
+            @else
+                <p class="text-gray-500 text-sm mb-2">No hay foto</p>
+            @endif
+        </div>
 
-        {{-- Botones --}}
+        <div class="mb-4">
+            <label class="block mb-2.5 text-sm font-medium text-heading" for="imagen">
+                Nueva Foto (opcional)
+            </label>
+            <input type="file" 
+                   name="imagen" 
+                   id="imagen" 
+                   accept="image/*"
+                   class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2 shadow-xs">
+            <p class="text-xs text-gray-500 mt-1">Dejar vacío para mantener la foto actual.</p>
+        </div>
+
         <div class="flex gap-3 pt-4">
             <button type="submit"
                     class="px-4 py-2 bg-brand text-white rounded-base hover:opacity-90">
-                Actualizar
+                Actualizar Cliente
             </button>
 
-            <a href="{{ route('admins.listado') }}"
+            <a href="{{ route('clientes.listado') }}"
                class="px-4 py-2 border border-default-medium rounded-base hover:bg-neutral-secondary-medium">
                 Cancelar
             </a>
