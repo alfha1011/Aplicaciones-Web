@@ -1,6 +1,5 @@
-/.phpunit.cache
+# Laravel
 /node_modules
-/public/build
 /public/hot
 /public/storage
 /storage/*.key
@@ -17,3 +16,27 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
+# Composer
+composer.phar
+composer.lock
+
+# NPM
+package-lock.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+*.swp
+*.swo
+*~
+.project
+.settings/
+.buildpath
+
+# Cache
+bootstrap/cache/*
+!bootstrap/cache/.gitignore
+!bootstrap/cache/.htaccess
