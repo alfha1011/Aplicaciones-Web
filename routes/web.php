@@ -21,15 +21,12 @@ Route::get('/', function () {
 // LOGIN
 // ============================================
 
-// Mostrar formulario
 Route::view('/login', 'auth.login')
     ->name('login');
 
-// Procesar login manual
 Route::post('/login', [LoginController::class, 'login'])
     ->name('login.procesar');
 
-// Logout
 Route::post('/logout', [LoginController::class, 'logout'])
     ->name('logout');
 
@@ -46,7 +43,6 @@ Route::get('auth/google/callback', function () {
 
         $googleUser = Socialite::driver('google')->user();
 
-        // Buscar en tabla administradores
         $admin = Administrador::where('email', $googleUser->getEmail())->first();
 
         if ($admin) {

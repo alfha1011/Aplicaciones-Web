@@ -64,11 +64,33 @@
                    class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs">
         </div>
 
+        {{-- Rol: SOLO MASTER puede cambiar el rol --}}
+        <div>
+            <label class="block mb-2.5 text-sm font-medium text-heading">Rol</label>
+            @if(Auth::guard('admin')->user()->esMaster())
+                <select name="rol"
+                        required
+                        class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs">
+                    <option value="">-- Selecciona un rol --</option>
+                    <option value="master" {{ old('rol', $administrador->rol) === 'master' ? 'selected' : '' }}>Master</option>
+                    <option value="base"   {{ old('rol', $administrador->rol) === 'base'   ? 'selected' : '' }}>Base</option>
+                </select>
+            @else
+                {{-- BASE ve su rol pero no puede cambiarlo --}}
+                <input type="text"
+                       value="{{ ucfirst($administrador->rol) }}"
+                       disabled
+                       class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base block w-full px-3 py-2 shadow-xs opacity-70">
+                {{-- Campo oculto para que el valor se envíe igual --}}
+                <input type="hidden" name="rol" value="{{ $administrador->rol }}">
+            @endif
+        </div>
+
         <div class="mb-4">
             <label class="block mb-2.5 text-sm font-medium text-heading">Foto Actual</label>
             @if($administrador->imagen)
                 <div class="mb-2">
-                    <img src="{{ asset('storage/administradores/' . $administrador->imagen) }}" 
+                    <img src="{{ asset('storage/administradores/' . $administrador->imagen) }}"
                          alt="Foto" class="h-32 w-32 object-cover rounded-lg border">
                 </div>
             @else
@@ -80,9 +102,9 @@
             <label class="block mb-2.5 text-sm font-medium text-heading" for="imagen">
                 Nueva Foto (opcional)
             </label>
-            <input type="file" 
-                   name="imagen" 
-                   id="imagen" 
+            <input type="file"
+                   name="imagen"
+                   id="imagen"
                    accept="image/*"
                    class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2 shadow-xs">
             <p class="text-xs text-gray-500 mt-1">Dejar vacío para mantener la foto actual.</p>

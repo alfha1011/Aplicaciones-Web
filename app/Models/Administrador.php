@@ -18,10 +18,21 @@ class Administrador extends Authenticatable
         'email',
         'password',
         'telefono',
-        'activo'
+        'activo',
+        'rol' 
     ];
 
     protected $hidden = [
         'password',
     ];
+
+    public function esMaster()
+    {
+        return $this->rol === 'master';
+    }
+
+    public function esBase()
+    {
+        return $this->rol === 'base';
+    }
 }

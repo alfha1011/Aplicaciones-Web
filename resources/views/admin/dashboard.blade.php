@@ -5,7 +5,6 @@
 <div class="min-h-screen bg-gray-100 p-8">
     <div class="max-w-7xl mx-auto">
         
-        {{-- Header con nombre del admin --}}
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <div class="flex justify-between items-center">
                 <div>
@@ -13,14 +12,25 @@
                         Dashboard Administrativo
                     </h1>
                     <p class="text-gray-600 mt-2">
-                        Bienvenido, <span class="font-semibold text-yellow-600">{{ Auth::guard('admin')->user()->nombre }} {{ Auth::guard('admin')->user()->apellido }}</span>
+                        Bienvenido, <span class="font-semibold text-yellow-600">
+                            {{ Auth::guard('admin')->user()->nombre }} 
+                            {{ Auth::guard('admin')->user()->apellido }}
+                        </span>
+                        
+                        <span class="ml-2 px-3 py-1 text-xs font-semibold rounded-full
+                            @if(Auth::guard('admin')->user()->esMaster()) 
+                                bg-purple-100 text-purple-800 border border-purple-300
+                            @else 
+                                bg-blue-100 text-blue-800 border border-blue-300
+                            @endif">
+                            {{ Auth::guard('admin')->user()->esMaster() ? '👑 MASTER' : '📋 BASE' }}
+                        </span>
                     </p>
-                    <p class="text-sm text-gray-500">
+                    <p class="text-sm text-gray-500 mt-1">
                         {{ Auth::guard('admin')->user()->email }}
                     </p>
                 </div>
                 
-                {{-- Botón de logout --}}
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button class="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 font-semibold shadow-md">
@@ -30,10 +40,8 @@
             </div>
         </div>
 
-        {{-- Tarjetas de estadísticas --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             
-            {{-- Administradores --}}
             <div class="bg-white rounded-lg shadow-md p-6">
                 <div class="flex items-center justify-between">
                     <div>
@@ -41,6 +49,16 @@
                         <p class="text-3xl font-bold text-gray-800 mt-2">
                             {{ \App\Models\Administrador::where('activo', 1)->count() }}
                         </p>
+                        @if(Auth::guard('admin')->user()->esMaster())
+                            <div class="mt-2 flex gap-2">
+                                <span class="text-xs bg-purple-50 text-purple-700 px-2 py-1 rounded">
+                                    {{ \App\Models\Administrador::where('rol', 'master')->count() }} Master
+                                </span>
+                                <span class="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded">
+                                    {{ \App\Models\Administrador::where('rol', 'base')->count() }} Base
+                                </span>
+                            </div>
+                        @endif
                     </div>
                     <div class="bg-blue-100 p-3 rounded-full">
                         <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,7 +68,6 @@
                 </div>
             </div>
 
-            {{-- Clientes --}}
             <div class="bg-white rounded-lg shadow-md p-6">
                 <div class="flex items-center justify-between">
                     <div>
@@ -67,7 +84,6 @@
                 </div>
             </div>
 
-            {{-- Canchas --}}
             <div class="bg-white rounded-lg shadow-md p-6">
                 <div class="flex items-center justify-between">
                     <div>
@@ -86,7 +102,50 @@
             
         </div>
 
-        {{-- Accesos rápidos --}}
+        <div class="mt-6 bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                Tus Permisos
+            </h2>
+            
+            @if(Auth::guard('admin')->user()->esMaster())
+                <div class="bg-purple-50 border-l-4 border-purple-500 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-purple-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-purple-800 font-semibold">
+                                Administrador MASTER - Control Total
+                            </p>
+                            <p class="text-sm text-purple-700 mt-1">
+                                Tienes acceso completo al sistema. Puedes crear, editar y <strong>eliminar</strong> administradores, clientes y canchas.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-blue-800 font-semibold">
+                                Administrador BASE - Permisos Limitados
+                            </p>
+                            <p class="text-sm text-blue-700 mt-1">
+                                Puedes crear y editar registros, pero <strong>no puedes eliminar</strong> administradores, clientes ni canchas. Solo el administrador MASTER tiene esos permisos.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        </div>
+
         <div class="mt-6 bg-white rounded-lg shadow-md p-6">
             <h2 class="text-xl font-bold text-gray-800 mb-4">Accesos Rápidos</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">

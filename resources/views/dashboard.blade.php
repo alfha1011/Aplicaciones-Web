@@ -11,7 +11,6 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            <!-- Tarjeta Canchas -->
             <a href="{{ route('canchas.listado') }}" 
                class="block p-6 bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                 <div class="flex items-center justify-between mb-4">
@@ -23,8 +22,6 @@
                 </div>
                 <p class="text-blue-100">Gestionar canchas de fútbol</p>
             </a>
-
-            <!-- Tarjeta Clientes -->
             <a href="{{ route('clientes.listado') }}" 
                class="block p-6 bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                 <div class="flex items-center justify-between mb-4">
@@ -36,8 +33,6 @@
                 </div>
                 <p class="text-green-100">Administrar clientes</p>
             </a>
-
-            <!-- Tarjeta Administradores -->
             <a href="{{ route('admins.listado') }}" 
                class="block p-6 bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                 <div class="flex items-center justify-between mb-4">
@@ -50,8 +45,6 @@
                 <p class="text-purple-100">Gestionar administradores</p>
             </a>
         </div>
-
-        <!-- Botón de cerrar sesión -->
         <div class="mt-8 flex justify-end">
             <form action="{{ route('logout') }}" method="POST">
                 @csrf

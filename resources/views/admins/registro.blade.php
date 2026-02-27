@@ -9,7 +9,7 @@
 
         <form action="{{ route('admins.guardar') }}" method="POST" enctype="multipart/form-data" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
             @csrf
-            
+
             <div class="mb-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="nombre">
                     Nombre *
@@ -62,11 +62,35 @@
                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
             </div>
 
+            {{-- Rol: MASTER puede elegir, BASE queda fijo como 'base' --}}
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">
+                    Rol *
+                </label>
+                @if(Auth::guard('admin')->user()->esMaster())
+                    <select name="rol" required
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('rol') border-red-500 @enderror">
+                        <option value="">-- Selecciona un rol --</option>
+                        <option value="master" {{ old('rol') === 'master' ? 'selected' : '' }}>Master</option>
+                        <option value="base"   {{ old('rol') === 'base'   ? 'selected' : '' }}>Base</option>
+                    </select>
+                @else
+                    {{-- Admin BASE: solo puede crear otros BASE --}}
+                    <input type="text" value="Base" disabled
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-500 bg-gray-100 leading-tight opacity-70">
+                    <input type="hidden" name="rol" value="base">
+                    <p class="text-xs text-gray-500 mt-1">Solo los administradores Master pueden asignar roles.</p>
+                @endif
+                @error('rol')
+                    <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
             <div class="mb-6">
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="imagen">
-                    Foto de Perfil *
+                    Foto de Perfil
                 </label>
-                <input type="file" name="imagen" id="imagen" accept="image/*" required
+                <input type="file" name="imagen" id="imagen" accept="image/*"
                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('imagen') border-red-500 @enderror">
                 <p class="text-xs text-gray-500 mt-1">Formatos: JPG, PNG, GIF. Máximo 2MB.</p>
                 @error('imagen')

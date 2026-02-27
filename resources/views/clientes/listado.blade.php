@@ -24,7 +24,7 @@
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                     <tr>
                         <th class="px-6 py-3">ID</th>
-                        <th class="px-6 py-3">Foto</th> 
+                        <th class="px-6 py-3">Foto</th>
                         <th class="px-6 py-3">Nombre</th>
                         <th class="px-6 py-3">Apellido</th>
                         <th class="px-6 py-3">Email</th>
@@ -40,7 +40,7 @@
                             <td class="px-6 py-4">{{ $cliente->id }}</td>
                             <td class="px-6 py-4">
                                 @if($cliente->imagen)
-                                    <img src="{{ asset('storage/clientes/' . $cliente->imagen) }}" 
+                                    <img src="{{ asset('storage/clientes/' . $cliente->imagen) }}"
                                          alt="Foto" class="h-10 w-10 rounded-full object-cover">
                                 @else
                                     <span class="text-gray-400 text-xs">Sin foto</span>
@@ -51,39 +51,43 @@
                             <td class="px-6 py-4">{{ $cliente->email }}</td>
                             <td class="px-6 py-4">{{ $cliente->telefono }}</td>
                             <td class="px-6 py-4">{{ $cliente->direccion ?? 'N/A' }}</td>
-                           <td class="px-6 py-4">
-    @if($cliente->latitud && $cliente->longitud)
-        <div id="map-{{ $cliente->id }}" class="w-48 h-32 rounded"></div>
+                            <td class="px-6 py-4">
+                                @if($cliente->latitud && $cliente->longitud)
+                                    <div id="map-{{ $cliente->id }}" class="w-48 h-32 rounded"></div>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const map = L.map('map-{{ $cliente->id }}')
-                    .setView([{{ $cliente->latitud }}, {{ $cliente->longitud }}], 30);
+                                    <script>
+                                        document.addEventListener('DOMContentLoaded', function () {
+                                            const map = L.map('map-{{ $cliente->id }}')
+                                                .setView([{{ $cliente->latitud }}, {{ $cliente->longitud }}], 30);
 
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; OpenStreetMap'
-                }).addTo(map);
+                                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                                attribution: '&copy; OpenStreetMap'
+                                            }).addTo(map);
 
-                L.marker([{{ $cliente->latitud }}, {{ $cliente->longitud }}])
-                    .addTo(map)
-                    .bindPopup("{{ $cliente->nombre }} {{ $cliente->apellido }}");
-            });
-        </script>
-    @else
-        <span class="text-gray-400">Sin ubicación</span>
-    @endif
-</td>
+                                            L.marker([{{ $cliente->latitud }}, {{ $cliente->longitud }}])
+                                                .addTo(map)
+                                                .bindPopup("{{ $cliente->nombre }} {{ $cliente->apellido }}");
+                                        });
+                                    </script>
+                                @else
+                                    <span class="text-gray-400">Sin ubicación</span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4">
                                 <a href="{{ route('clientes.editar', $cliente->id) }}"
                                     class="text-blue-600 hover:text-blue-900 mr-2">Editar</a>
-                                <form action="{{ route('clientes.eliminar', $cliente->id) }}" method="POST" class="inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-900"
-                                        onclick="return confirm('¿Estás seguro de eliminar este cliente?')">
-                                        Eliminar
-                                    </button>
-                                </form>
+
+                                {{-- Eliminar: SOLO MASTER --}}
+                                @if(Auth::guard('admin')->user()->esMaster())
+                                    <form action="{{ route('clientes.eliminar', $cliente->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-600 hover:text-red-900"
+                                            onclick="return confirm('¿Estás seguro de eliminar este cliente?')">
+                                            Eliminar
+                                        </button>
+                                    </form>
+                                @endif
                             </td>
                         </tr>
                     @empty

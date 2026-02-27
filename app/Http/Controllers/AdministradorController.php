@@ -5,70 +5,82 @@ namespace App\Http\Controllers;
 use App\Models\Administrador;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;  
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class AdministradorController extends Controller
 {
-    // Muestra el listado de administradores
     public function listado()
     {
         $administradores = Administrador::all();
         return view('admins.listado', compact('administradores'));
     }
 
-    // Muestra el formulario de registro
     public function registro()
     {
+        if (!Auth::guard('admin')->user()->esMaster()) {
+            return redirect()->back()->withErrors(['error' => 'Solo los administradores MASTER pueden crear nuevos administradores.']);
+        }
+
         return view('admins.registro');
     }
 
-    // Muestra el formulario de edición
     public function editar($id)
     {
         $administrador = Administrador::findOrFail($id);
         return view('admins.editar', compact('administrador'));
     }
 
-    // Guarda el nuevo administrador (CON IMAGEN)
     public function guardar(Request $request)
     {
+        if (!Auth::guard('admin')->user()->esMaster()) {
+            return redirect()->back()->withErrors(['error' => 'Solo los administradores MASTER pueden crear nuevos administradores.']);
+        }
+
         $request->validate([
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
             'email' => 'required|email|unique:administradores,email',
-            'password' => 'required|string|min:6',
-            'telefono' => 'nullable|string|max:15',
-            'imagen' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048' 
+            'password' => 'required|min:6',
+            'telefono' => 'required|string|max:15',
+            'rol' => 'required|in:master,base',
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ], [
+            'nombre.required' => 'El nombre es obligatorio',
+            'apellido.required' => 'El apellido es obligatorio',
+            'email.required' => 'El email es obligatorio',
+            'email.unique' => 'Este email ya está registrado',
+            'password.required' => 'La contraseña es obligatoria',
+            'password.min' => 'La contraseña debe tener al menos 6 caracteres',
+            'rol.required' => 'Debes seleccionar un rol',
+            'telefono.required' => 'El teléfono es obligatorio',
         ]);
 
-        // Crear administrador
         $administrador = Administrador::create([
             'nombre' => $request->nombre,
             'apellido' => $request->apellido,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'telefono' => $request->telefono
+            'telefono' => $request->telefono,
+            'activo' => 1,
+            'rol' => $request->rol
         ]);
 
-        // Subir imagen
         if ($request->hasFile('imagen')) {
             $imagen = $request->file('imagen');
             $extension = $imagen->getClientOriginalExtension();
             $nombreImagen = "administradores_{$administrador->id}.{$extension}";
             
-            // Guardar en storage
             $imagen->storeAs('public/administradores', $nombreImagen);
             
-            // Actualizar registro
             $administrador->imagen = $nombreImagen;
             $administrador->save();
         }
 
         return redirect()->route('admins.listado')
-            ->with('success', 'Administrador registrado exitosamente');
+            ->with('success', 'Administrador creado correctamente.');
     }
 
-    // Actualizar administrador (CON IMAGEN)
     public function actualizar(Request $request, $id)
     {
         $administrador = Administrador::findOrFail($id);
@@ -79,27 +91,37 @@ class AdministradorController extends Controller
             'email' => 'required|email|unique:administradores,email,' . $id,
             'telefono' => 'nullable|string|max:15',
             'password' => 'nullable|string|min:6',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048' 
+            'rol' => 'required|in:master,base',
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ], [
+            'nombre.required' => 'El nombre es obligatorio',
+            'apellido.required' => 'El apellido es obligatorio',
+            'email.required' => 'El email es obligatorio',
+            'email.unique' => 'Este email ya está registrado',
+            'password.min' => 'La contraseña debe tener al menos 6 caracteres',
+            'rol.required' => 'Debes seleccionar un rol',
         ]);
 
-        // Actualizar datos
+        if ($administrador->rol !== $request->rol && !Auth::guard('admin')->user()->esMaster()) {
+            return redirect()->back()->withErrors(['error' => 'Solo los administradores MASTER pueden cambiar roles.']);
+        }
+
         $administrador->nombre = $request->nombre;
         $administrador->apellido = $request->apellido;
         $administrador->email = $request->email;
         $administrador->telefono = $request->telefono;
+        $administrador->rol = $request->rol;
 
         if ($request->filled('password')) {
             $administrador->password = Hash::make($request->password);
         }
 
-        // Actualizar imagen si se subió nueva
         if ($request->hasFile('imagen')) {
-            // Eliminar imagen anterior
+          
             if ($administrador->imagen) {
                 Storage::delete('public/administradores/' . $administrador->imagen);
             }
             
-            // Subir nueva imagen
             $imagen = $request->file('imagen');
             $extension = $imagen->getClientOriginalExtension();
             $nombreImagen = "administradores_{$administrador->id}.{$extension}";
@@ -111,22 +133,28 @@ class AdministradorController extends Controller
         $administrador->save();
 
         return redirect()->route('admins.listado')
-            ->with('success', 'Administrador actualizado correctamente');
+            ->with('success', 'Administrador actualizado correctamente.');
     }
 
-    // Eliminar administrador (CON ELIMINACIÓN DE IMAGEN)
     public function eliminar($id)
     {
+        if (!Auth::guard('admin')->user()->esMaster()) {
+            return redirect()->back()->withErrors(['error' => 'Solo los administradores MASTER pueden eliminar registros.']);
+        }
+
         $administrador = Administrador::findOrFail($id);
-        
-        // Eliminar imagen del storage
+
+        if ($administrador->id === Auth::guard('admin')->user()->id) {
+            return redirect()->back()->withErrors(['error' => 'No puedes eliminarte a ti mismo.']);
+        }
+
         if ($administrador->imagen) {
             Storage::delete('public/administradores/' . $administrador->imagen);
         }
-        
+
         $administrador->delete();
 
         return redirect()->route('admins.listado')
-                        ->with('success', 'Administrador eliminado permanentemente.');
+            ->with('success', 'Administrador eliminado correctamente.');
     }
 }

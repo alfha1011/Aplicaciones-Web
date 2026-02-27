@@ -9,12 +9,8 @@ use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
-    /**
-     * Procesar el login del usuario
-     */
     public function login(Request $request)
     {
-        // Validar las credenciales
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
@@ -24,26 +20,19 @@ class LoginController extends Controller
             'password.required' => 'La contraseña es obligatoria.',
         ]);
 
-        // Verificar si se debe recordar la sesión
         $remember = $request->filled('remember');
 
-        // Intentar autenticar
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
-            // Redirigir al dashboard (que usa app.blade.php)
             return redirect()->intended('/dashboard');
         }
 
-        // Si falla, regresar con error
         throw ValidationException::withMessages([
             'email' => 'Las credenciales proporcionadas no coinciden con nuestros registros.',
         ]);
     }
 
-    /**
-     * Cerrar sesión del usuario
-     */
     public function logout(Request $request)
     {
         Auth::logout();

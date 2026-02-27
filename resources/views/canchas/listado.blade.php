@@ -45,15 +45,15 @@
                         <td class="px-6 py-4">
                             <div class="flex space-x-1">
                                 @if($cancha->imagen1)
-                                    <img src="{{ asset('storage/canchas/' . $cancha->imagen1) }}" 
+                                    <img src="{{ asset('storage/canchas/' . $cancha->imagen1) }}"
                                          alt="Img1" class="h-10 w-10 object-cover rounded">
                                 @endif
                                 @if($cancha->imagen2)
-                                    <img src="{{ asset('storage/canchas/' . $cancha->imagen2) }}" 
+                                    <img src="{{ asset('storage/canchas/' . $cancha->imagen2) }}"
                                          alt="Img2" class="h-10 w-10 object-cover rounded">
                                 @endif
                                 @if($cancha->imagen3)
-                                    <img src="{{ asset('storage/canchas/' . $cancha->imagen3) }}" 
+                                    <img src="{{ asset('storage/canchas/' . $cancha->imagen3) }}"
                                          alt="Img3" class="h-10 w-10 object-cover rounded">
                                 @endif
                                 @if(!$cancha->imagen1 && !$cancha->imagen2 && !$cancha->imagen3)
@@ -65,7 +65,7 @@
                         <td class="px-6 py-4">{{ $cancha->tipo }}</td>
                         <td class="px-6 py-4">${{ number_format($cancha->precio_hora, 2) }}</td>
                         <td class="px-6 py-4">
-                            <span class="px-2 py-1 text-xs font-semibold rounded 
+                            <span class="px-2 py-1 text-xs font-semibold rounded
                                 @if($cancha->estado == 'disponible') bg-green-100 text-green-800
                                 @elseif($cancha->estado == 'mantenimiento') bg-yellow-100 text-yellow-800
                                 @else bg-red-100 text-red-800 @endif">
@@ -87,12 +87,15 @@
                         <td class="px-6 py-4">
                             <a href="{{ route('canchas.editar', $cancha->id) }}"
                                 class="text-blue-600 hover:text-blue-900 mr-2">Editar</a>
-                            <form action="{{ route('canchas.eliminar', $cancha->id) }}" method="POST" class="inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:text-red-900"
-                                    onclick="return confirm('¿Estás seguro de eliminar esta cancha?')">Eliminar</button>
-                            </form>
+
+                            @if(Auth::guard('admin')->user()->esMaster())
+                                <form action="{{ route('canchas.eliminar', $cancha->id) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-red-600 hover:text-red-900"
+                                        onclick="return confirm('¿Estás seguro de eliminar esta cancha?')">Eliminar</button>
+                                </form>
+                            @endif
                         </td>
                     </tr>
                 @empty

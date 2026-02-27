@@ -1,66 +1,228 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistema de Reservas de Canchas - Laravel
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistema de gestión de reservas de canchas de fútbol con autenticación personalizada usando Guard y Laravel Socialite.
 
-## About Laravel
+## 👥 Equipo
+- Oscar Enrique Rodriguez Rangel
+- [Nombre de tu compañero]
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Requisitos
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- PHP 8.2+
+- Composer 2.x
+- MySQL 5.7+
+- Node.js 18+ y NPM
+- XAMPP (recomendado)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 📦 Instalación
 
-## Learning Laravel
+### 1. Clonar el repositorio
+```bash
+git clone https://github.com/alfha1011/Aplicaciones-Web.git
+cd Aplicaciones-Web
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 2. Instalar dependencias de PHP
+```bash
+composer install
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 3. Instalar dependencias de Node.js
+```bash
+npm install
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 4. Configurar variables de entorno
+```bash
+cp .env.example .env
+```
 
-## Laravel Sponsors
+Edita el archivo `.env` con tus credenciales:
+```env
+DB_DATABASE=reservas_canchas
+DB_USERNAME=root
+DB_PASSWORD=
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+GOOGLE_CLIENT_ID=tu_client_id
+GOOGLE_CLIENT_SECRET=tu_client_secret
+GOOGLE_REDIRECT_URI=http://127.0.0.1:8000/auth/google/callback
+```
 
-### Premium Partners
+### 5. Generar key de la aplicación
+```bash
+php artisan key:generate
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### 6. Crear la base de datos
 
-## Contributing
+En phpMyAdmin, crea una base de datos llamada: `reservas_canchas`
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 7. Importar la estructura
 
-## Code of Conduct
+Importa el archivo `database/reservas_canchas.sql` en phpMyAdmin
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 8. Compilar assets (en una terminal)
+```bash
+npm run dev
+```
 
-## Security Vulnerabilities
+**IMPORTANTE:** Deja esta terminal corriendo
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 9. Iniciar el servidor (en otra terminal)
+```bash
+php artisan serve
+```
 
-## License
+### 10. Acceder al sistema
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Abre tu navegador en: `http://127.0.0.1:8000`
+
+## 🔑 Credenciales de prueba
+
+### Administrador principal:
+- **Email:** `admin@canchas.com`
+- **Password:** `password`
+
+### Cuenta de Oscar:
+- **Email:** `2124100008@soy.utj.edu.mx`
+- **Password:** `123456`
+
+## 📋 Características principales
+
+### Autenticación
+- ✅ Sistema de login manual con guard personalizado `admin`
+- ✅ Autenticación con Google (Laravel Socialite)
+- ✅ Validación de estado activo del administrador
+- ✅ Protección de rutas con middleware `auth:admin`
+- ✅ Manejo de errores detallado
+- ✅ Cierre de sesión seguro con invalidación de tokens
+
+### Gestión
+- ✅ CRUD completo de Administradores
+- ✅ CRUD completo de Clientes
+- ✅ CRUD completo de Canchas
+- ✅ Dashboard con estadísticas en tiempo real
+- ✅ Contraseñas hasheadas con Bcrypt
+
+### Base de datos
+- Tabla `administradores` con campo `activo` para validación
+- Passwords encriptados con algoritmo Bcrypt
+- Guard personalizado conectado a tabla `administradores`
+
+## 🛠️ Tecnologías utilizadas
+
+- **Backend:** Laravel 10.x
+- **Frontend:** Tailwind CSS + Vite
+- **Base de datos:** MySQL
+- **Autenticación OAuth:** Laravel Socialite (Google)
+
+## 📁 Estructura importante
+```
+app/
+├── Http/
+│   └── Controllers/
+│       └── Admin/
+│           └── LoginController.php    # Controlador de autenticación
+├── Models/
+│   └── Administrador.php              # Modelo con Authenticatable
+config/
+└── auth.php                           # Guards y providers personalizados
+routes/
+└── web.php                           # Rutas protegidas con auth:admin
+resources/
+└── views/
+    ├── admin/
+    │   └── dashboard.blade.php       # Dashboard principal
+    └── auth/
+        └── login.blade.php           # Formulario de login
+```
+
+## ⚙️ Configuración del Guard Admin
+
+El sistema usa un guard personalizado llamado `admin` configurado en `config/auth.php`:
+```php
+'guards' => [
+    'admin' => [
+        'driver' => 'session',
+        'provider' => 'administradores',
+    ],
+],
+
+'providers' => [
+    'administradores' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\Administrador::class,
+    ],
+],
+```
+
+## 🔧 Comandos útiles
+
+### Limpiar cache
+```bash
+php artisan config:clear
+php artisan cache:clear
+php artisan view:clear
+php artisan route:clear
+```
+
+### Ver rutas registradas
+```bash
+php artisan route:list
+```
+
+### Crear nuevo administrador (Tinker)
+```bash
+php artisan tinker
+```
+```php
+\App\Models\Administrador::create([
+    'nombre' => 'Nombre',
+    'apellido' => 'Apellido',
+    'email' => 'email@example.com',
+    'password' => bcrypt('password'),
+    'telefono' => '1234567890',
+    'activo' => 1
+]);
+exit
+```
+
+## 📝 Notas importantes
+
+- ⚠️ Nunca subas el archivo `.env` al repositorio
+- ⚠️ Las contraseñas deben estar siempre hasheadas con `bcrypt()` o `Hash::make()`
+- ⚠️ Solo administradores con `activo = 1` pueden iniciar sesión
+- ⚠️ Mantén actualizadas tus dependencias con `composer update` y `npm update`
+
+## 🤝 Colaboración
+
+Para trabajar en equipo:
+
+### Descargar cambios del compañero:
+```bash
+git pull
+```
+
+### Subir tus cambios:
+```bash
+git add .
+git commit -m "Descripción de los cambios"
+git push
+```
+
+### Si hay conflictos:
+Git te indicará los archivos con conflicto. Ábrelos, resuélvelos manualmente y luego:
+```bash
+git add .
+git commit -m "Resueltos conflictos"
+git push
+```
+
+## 📧 Contacto
+
+- **GitHub:** [alfha1011](https://github.com/alfha1011)
+- **Repositorio:** https://github.com/alfha1011/Aplicaciones-Web
+
+## 📄 Licencia
+
+Este proyecto fue desarrollado como parte de la materia de Aplicaciones Web - UTJ 2026.

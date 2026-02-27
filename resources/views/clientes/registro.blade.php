@@ -62,11 +62,34 @@
                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">{{ old('direccion') }}</textarea>
             </div>
 
+            {{-- Mapa para elegir ubicación --}}
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">
+                    Ubicación (haz clic en el mapa para marcar)
+                </label>
+                <div id="map-registro" class="w-full h-64 rounded border border-gray-300 mb-2"></div>
+                <div class="flex gap-4">
+                    <div class="flex-1">
+                        <label class="block text-gray-500 text-xs mb-1">Latitud</label>
+                        <input type="text" name="latitud" id="latitud" value="{{ old('latitud') }}"
+                            readonly placeholder="Click en el mapa..."
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-600 bg-gray-50 text-sm leading-tight">
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-gray-500 text-xs mb-1">Longitud</label>
+                        <input type="text" name="longitud" id="longitud" value="{{ old('longitud') }}"
+                            readonly placeholder="Click en el mapa..."
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-600 bg-gray-50 text-sm leading-tight">
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">Opcional. Haz clic en el mapa para seleccionar la ubicación del cliente.</p>
+            </div>
+
             <div class="mb-6">
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="imagen">
-                    Foto de Perfil *
+                    Foto de Perfil
                 </label>
-                <input type="file" name="imagen" id="imagen" accept="image/*" required
+                <input type="file" name="imagen" id="imagen" accept="image/*"
                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('imagen') border-red-500 @enderror">
                 <p class="text-xs text-gray-500 mt-1">Formatos: JPG, PNG, GIF. Máximo 2MB.</p>
                 @error('imagen')
@@ -85,4 +108,33 @@
         </form>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const map = L.map('map-registro').setView([20.6597, -103.3496], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        let marker = null;
+
+        map.on('click', function (e) {
+            const lat = e.latlng.lat.toFixed(6);
+            const lng = e.latlng.lng.toFixed(6);
+
+            document.getElementById('latitud').value  = lat;
+            document.getElementById('longitud').value = lng;
+
+            if (marker) {
+                marker.setLatLng(e.latlng);
+            } else {
+                marker = L.marker(e.latlng).addTo(map);
+            }
+
+            marker.bindPopup('Ubicación seleccionada').openPopup();
+        });
+    });
+</script>
 @endsection

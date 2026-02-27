@@ -15,6 +15,7 @@ class Cancha extends Model
         'nombre',
         'direccion',
         'telefono',
+        'tipo',
         'precio_hora',
         'latitud',
         'longitud',

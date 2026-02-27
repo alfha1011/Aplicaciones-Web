@@ -17,7 +17,6 @@
         </div>
     @endif
 
-    {{-- 👇 AGREGAR enctype --}}
     <form action="{{ route('clientes.actualizar', $cliente->id) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
         @csrf
         @method('PUT')
@@ -73,11 +72,35 @@
                    class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs">
         </div>
 
+        <div>
+            <label class="block mb-2.5 text-sm font-medium text-heading">
+                Ubicación (haz clic en el mapa para cambiar)
+            </label>
+            <div id="map-editar" class="w-full h-64 rounded border border-gray-300 mb-2"></div>
+            <div class="flex gap-4">
+                <div class="flex-1">
+                    <label class="block text-gray-500 text-xs mb-1">Latitud</label>
+                    <input type="text" name="latitud" id="latitud"
+                        value="{{ old('latitud', $cliente->latitud) }}"
+                        readonly placeholder="Click en el mapa..."
+                        class="border rounded w-full py-2 px-3 text-gray-600 bg-gray-50 text-sm">
+                </div>
+                <div class="flex-1">
+                    <label class="block text-gray-500 text-xs mb-1">Longitud</label>
+                    <input type="text" name="longitud" id="longitud"
+                        value="{{ old('longitud', $cliente->longitud) }}"
+                        readonly placeholder="Click en el mapa..."
+                        class="border rounded w-full py-2 px-3 text-gray-600 bg-gray-50 text-sm">
+                </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Haz clic en el mapa para actualizar la ubicación.</p>
+        </div>
+
         <div class="mb-4">
             <label class="block mb-2.5 text-sm font-medium text-heading">Foto Actual</label>
             @if($cliente->imagen)
                 <div class="mb-2">
-                    <img src="{{ asset('storage/clientes/' . $cliente->imagen) }}" 
+                    <img src="{{ asset('storage/clientes/' . $cliente->imagen) }}"
                          alt="Foto" class="h-32 w-32 object-cover rounded-lg border">
                 </div>
             @else
@@ -89,9 +112,9 @@
             <label class="block mb-2.5 text-sm font-medium text-heading" for="imagen">
                 Nueva Foto (opcional)
             </label>
-            <input type="file" 
-                   name="imagen" 
-                   id="imagen" 
+            <input type="file"
+                   name="imagen"
+                   id="imagen"
                    accept="image/*"
                    class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2 shadow-xs">
             <p class="text-xs text-gray-500 mt-1">Dejar vacío para mantener la foto actual.</p>
@@ -111,4 +134,42 @@
 
     </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const latInicial = {{ $cliente->latitud ?? 20.6597 }};
+        const lngInicial = {{ $cliente->longitud ?? -103.3496 }};
+        const tieneUbicacion = {{ $cliente->latitud ? 'true' : 'false' }};
+
+        const map = L.map('map-editar').setView([latInicial, lngInicial], 15);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        let marker = null;
+
+        if (tieneUbicacion) {
+            marker = L.marker([latInicial, lngInicial]).addTo(map);
+            marker.bindPopup('Ubicación actual').openPopup();
+        }
+
+        map.on('click', function (e) {
+            const lat = e.latlng.lat.toFixed(6);
+            const lng = e.latlng.lng.toFixed(6);
+
+            document.getElementById('latitud').value  = lat;
+            document.getElementById('longitud').value = lng;
+
+            if (marker) {
+                marker.setLatLng(e.latlng);
+            } else {
+                marker = L.marker(e.latlng).addTo(map);
+            }
+
+            marker.bindPopup('Nueva ubicación').openPopup();
+        });
+    });
+</script>
 @endsection
