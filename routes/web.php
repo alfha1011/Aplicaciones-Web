@@ -9,6 +9,33 @@ use App\Http\Controllers\CanchaController;
 use App\Http\Controllers\AdministradorController;
 use App\Http\Controllers\Admin\LoginController;
 
+
+// ============================================
+// ACCESO DIRECTO AL DASHBOARD (SOLO DESARROLLO)
+// ============================================
+Route::get('/acceso-directo', function() {
+    $admin = Administrador::where('activo', 1)->first();
+    
+    if ($admin) {
+        Auth::guard('admin')->login($admin);
+        return redirect('/dashboard')->with('success', 'Acceso directo como: ' . $admin->email);
+    }
+    
+    return '❌ No hay administradores activos en la base de datos';
+});
+
+// También puedes agregar una versión ultra corta:
+Route::get('/d', function() {
+    $admin = Administrador::where('activo', 1)->first();
+    
+    if ($admin) {
+        Auth::guard('admin')->login($admin);
+        return redirect('/dashboard');
+    }
+    
+    return 'No hay admin';
+});
+
 // ============================================
 // RUTA RAÍZ
 // ============================================
@@ -21,12 +48,15 @@ Route::get('/', function () {
 // LOGIN
 // ============================================
 
+// Mostrar formulario
 Route::view('/login', 'auth.login')
     ->name('login');
 
+// Procesar login manual
 Route::post('/login', [LoginController::class, 'login'])
     ->name('login.procesar');
 
+// Logout
 Route::post('/logout', [LoginController::class, 'logout'])
     ->name('logout');
 
@@ -43,6 +73,7 @@ Route::get('auth/google/callback', function () {
 
         $googleUser = Socialite::driver('google')->user();
 
+        // Buscar en tabla administradores
         $admin = Administrador::where('email', $googleUser->getEmail())->first();
 
         if ($admin) {

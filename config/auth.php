@@ -41,8 +41,13 @@ return [
         'provider' => 'users',
     ],
 
-    'admin' => [
-        'driver' => 'session',
+     'admin' => [
+        'driver' => 'session',           // (para el web.php)
+        'provider' => 'administradores',
+    ],
+
+    'admin-api' => [                     //  para la API
+        'driver' => 'sanctum',
         'provider' => 'administradores',
     ],
 ],
